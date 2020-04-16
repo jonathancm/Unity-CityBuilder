@@ -17,10 +17,10 @@ namespace CityBuilder
             Dictionary<int, BasicBuilding> hashMap = new Dictionary<int, BasicBuilding>();
             foreach (var building in buildings)
             {
-                if (hashMap.ContainsKey(building.state.descriptor.uuid))
+                if (hashMap.ContainsKey(building.descriptor.uuid))
                     continue;
 
-                hashMap.Add(building.state.descriptor.uuid, building);
+                hashMap.Add(building.descriptor.uuid, building);
             }
             return hashMap;
         }

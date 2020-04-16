@@ -43,7 +43,7 @@ namespace CityBuilder
                 return;
             }
 
-            constructionEditor.SetSelectedStructure(buildingPrefab.state.descriptor.uuid);
+            constructionEditor.SetSelectedStructure(buildingPrefab.descriptor.uuid);
         }
     }
 }

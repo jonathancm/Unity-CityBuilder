@@ -228,7 +228,7 @@ namespace CityBuilder
             //
             // Update Cursor Color
             //
-            switch (structureToBuild.state.descriptor.category)
+            switch (structureToBuild.descriptor.category)
             {
                 case BuildingDescriptor.Category.Building:
                 case BuildingDescriptor.Category.Roadway:
@@ -257,7 +257,7 @@ namespace CityBuilder
             //
             // Handle Click Events
             //
-            switch (structureToBuild.state.descriptor.category)
+            switch (structureToBuild.descriptor.category)
             {
                 case BuildingDescriptor.Category.Building:
                 {
@@ -335,16 +335,9 @@ namespace CityBuilder
 
         public void CreateStructure(BasicBuilding.BuildingState structureInfo)
         {
-            //var structurePrefab = Resources.Load(structureInfo.type.ToString()) as GameObject;
-            //if (structurePrefab == null)
-            //{
-            //    Debug.LogError("Could not find prefab: " + structureInfo.type.ToString());
-            //    return;
-            //}
-
-            //Vector3 gridPos = new Vector3(structureInfo.position.x, structureInfo.position.y, structureInfo.position.z);
-            //var newStructure = Instantiate(structurePrefab, gridPos, Quaternion.identity);
-            //newStructure.GetComponent<BasicStructure>().OnBuild();
+            Vector3 gridPos = new Vector3(structureInfo.position.x, structureInfo.position.y, structureInfo.position.z);
+            var newStructure = Instantiate(buildingHashMap[structureInfo.uuid], gridPos, Quaternion.identity);
+            newStructure.GetComponent<BasicBuilding>().OnBuild();
         }
 
         public void CreateStructure(BasicBuilding structurePrefab, Vector3 gridPosition)

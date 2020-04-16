@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fcd6cdaee63ed0478b15dc232dd4fbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  descriptor: {fileID: 11400000, guid: 63f46ae6062eb0b48b0e4d5cefdbea7a, type: 2}
   state:
+    uuid: 0
+    category: 0
     position:
       x: 0
       y: 0
       z: 0
-    descriptor: {fileID: 11400000, guid: 63f46ae6062eb0b48b0e4d5cefdbea7a, type: 2}
   roadTiles:
     straight: {fileID: 1381714832922922953}
     turn: {fileID: 8084636371309977818}

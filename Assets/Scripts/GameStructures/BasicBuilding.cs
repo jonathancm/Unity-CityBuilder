@@ -18,11 +18,19 @@ namespace CityBuilder
         [System.Serializable]
         public struct BuildingState
         {
+            public int uuid;
+            public BuildingDescriptor.Category category;
             public GridPosition position;
-            public BuildingDescriptor descriptor;
         }
 
+        public BuildingDescriptor descriptor;
         public BuildingState state;
+
+        private void Awake()
+        {
+            state.uuid = descriptor.uuid;
+            state.category = descriptor.category;
+        }
 
         public MeshFilter[] meshFilters
         {

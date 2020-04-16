@@ -9,6 +9,7 @@ namespace CityBuilder
     [CreateAssetMenu(fileName = "BuildingInfo", menuName = "CityBuilder/New BuildingInfo")]
     public class BuildingDescriptor : ScriptableObject
     {
+        [System.Serializable]
         public enum Category
         {
             None,

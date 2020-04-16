@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea4c99eb5a2b874993a089addf9acf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  descriptor: {fileID: 11400000, guid: 05cf4dd7bc4249344b39f640aadb3df8, type: 2}
   state:
+    uuid: 0
+    category: 0
     position:
       x: 0
       y: 0
       z: 0
-    descriptor: {fileID: 11400000, guid: 05cf4dd7bc4249344b39f640aadb3df8, type: 2}
   hasElectricity: 0
   hasAqueduct: 0
 --- !u!1001 &7729829271090000519
