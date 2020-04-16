@@ -311,18 +311,26 @@ namespace CityBuilder
 
         public void SetSelectedStructure(int uuid)
         {
+            playerHand.PreviewStructure.meshFilter.mesh = null;
+            playerHand.PreviewStructure.meshRenderer.material = null;
             structureToBuild = buildingHashMap[uuid];
-            if (structureToBuild != null)
+            if (structureToBuild == null)
+                return;
+
+            MeshFilter[] meshFilters = structureToBuild.meshFilters;
+            if (meshFilters.Length == 0)
+                return;
+
+            CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+            for (int i = 0; i < meshFilters.Length; i++)
             {
-                playerHand.PreviewStructure.meshFilter.sharedMesh = structureToBuild.meshFilter.sharedMesh;
-                playerHand.PreviewStructure.meshRenderer.sharedMaterial = structureToBuild.meshRenderer.sharedMaterial;
+                combine[i].mesh = meshFilters[i].sharedMesh;
+                combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
             }
-            else
-            {
-                // TODO: Setup eraser tool
-                playerHand.PreviewStructure.meshFilter.sharedMesh = null;
-                playerHand.PreviewStructure.meshRenderer.sharedMaterial = null;
-            }
+
+            playerHand.PreviewStructure.meshFilter.mesh = new Mesh();
+            playerHand.PreviewStructure.meshFilter.mesh.CombineMeshes(combine);
+            playerHand.PreviewStructure.meshRenderer.material = structureToBuild.meshRenderers[0].sharedMaterial;
         }
 
         public void CreateStructure(BasicBuilding.BuildingState structureInfo)

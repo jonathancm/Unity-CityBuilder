@@ -24,19 +24,19 @@ namespace CityBuilder
 
         public BuildingState state;
 
-        public MeshFilter meshFilter
+        public MeshFilter[] meshFilters
         {
             get
             {
-                return GetComponentInChildren<MeshFilter>();
+                return GetComponentsInChildren<MeshFilter>(false);
             }
         }
 
-        public MeshRenderer meshRenderer
+        public MeshRenderer[] meshRenderers
         {
             get
             {
-                return GetComponentInChildren<MeshRenderer>();
+                return GetComponentsInChildren<MeshRenderer>(false);
             }
         }
 
