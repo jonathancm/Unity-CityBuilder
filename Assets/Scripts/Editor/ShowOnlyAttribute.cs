@@ -11,7 +11,7 @@ namespace CityBuilder
     }
 
     [CustomPropertyDrawer(typeof(ShowOnlyAttribute))]
-    public class ReadOnlyDrawer : PropertyDrawer
+    public class ShowOnlyDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property,
                                                 GUIContent label)

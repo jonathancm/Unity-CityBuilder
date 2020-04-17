@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1425364752905915717}
   - component: {fileID: 1425364752905915714}
   - component: {fileID: 4593231105209033920}
+  - component: {fileID: 1827569571901684576}
+  - component: {fileID: 6203548869377983050}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -44,14 +46,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ee1b8e43ffc7d547b6a3b9c2e6599d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingLibrary: {fileID: 11400000, guid: bbe34f94f97a5f2409e200d87e3c8932, type: 2}
-  timeDilation: 1
   gridSettings:
     cellSize: 1
   cameraSettings:
     panSpeed: 0.01
     minSize: 1
     maxSize: 15
+  buildingLibrary: {fileID: 11400000, guid: bbe34f94f97a5f2409e200d87e3c8932, type: 2}
 --- !u!114 &4593231105209033920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64,3 +65,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07307700d505d8b41a37c49ae4c82a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1827569571901684576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425364752905915716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c96f4d4d8d9c6642b564bd4baf16985, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameSecondsPerLifeSeconds: 3600
+  timeDilation: 1
+--- !u!114 &6203548869377983050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425364752905915716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5ecff5ebc0b5eb41b59e66afa1eb0c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skyMaterial: {fileID: 2100000, guid: 6f25bbab174dce94285c2652df101f34, type: 2}
+  SkyColorDay: {r: 0.8, g: 0.88, b: 1, a: 1}
+  SkyColorNight: {r: 0.09019608, g: 0.09411765, b: 0.1, a: 1}
+  GroundColorDay: {r: 0, g: 0.41960785, b: 1, a: 1}
+  GroundColorNight: {r: 0, g: 0.041176464, b: 0.1, a: 1}
+  exposureMin: 0.6
+  exposureMax: 2

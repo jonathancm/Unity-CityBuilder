@@ -45,7 +45,6 @@ namespace CityBuilder
         //
         // Configurable Parameters
         //
-        [Range(0.0f, 3.0f)] public float timeDilation = 1.0f;
         public GridSettings gridSettings;
         public CameraSettings cameraSettings;
 
@@ -362,16 +361,6 @@ namespace CityBuilder
             worldPos.y = gridPos.y * gridSettings.cellSize + (gridSettings.cellSize / 2);
             worldPos.z = gridPos.z * gridSettings.cellSize + (gridSettings.cellSize / 2);
             return worldPos;
-        }
-
-        [MenuItem("CityBuilderTools/RefreshBuildings")]
-        static void RefreshBuildings()
-        {
-            var buildings = FindObjectsOfType<BasicBuilding>();
-            foreach (var element in buildings)
-            {
-                element.OnBuild();
-            }
         }
     }
 }
