@@ -49,9 +49,10 @@ MonoBehaviour:
   gridSettings:
     cellSize: 1
   cameraSettings:
-    panSpeed: 0.01
-    minSize: 1
-    maxSize: 15
+    panSpeed: 0.001
+    zoomSpeed: 10
+    zoomNearest: 20
+    zoomFarthest: 100
   buildingLibrary: {fileID: 11400000, guid: bbe34f94f97a5f2409e200d87e3c8932, type: 2}
 --- !u!114 &4593231105209033920
 MonoBehaviour:
@@ -79,6 +80,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameSecondsPerLifeSeconds: 3600
   timeDilation: 1
+  eventSunset:
+    m_PersistentCalls:
+      m_Calls: []
+  eventSunrise:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &6203548869377983050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,10 +98,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5ecff5ebc0b5eb41b59e66afa1eb0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transitionDurationInHours: 2
+  animState: 0
+  alpha: 0
+  cameraEffect: {fileID: 0}
+  effectWeightNight: 1
+  effectWeightDay: 0
   skyMaterial: {fileID: 2100000, guid: 6f25bbab174dce94285c2652df101f34, type: 2}
   SkyColorDay: {r: 0.8, g: 0.88, b: 1, a: 1}
   SkyColorNight: {r: 0.09019608, g: 0.09411765, b: 0.1, a: 1}
   GroundColorDay: {r: 0, g: 0.41960785, b: 1, a: 1}
   GroundColorNight: {r: 0, g: 0.041176464, b: 0.1, a: 1}
-  exposureMin: 0.6
-  exposureMax: 2
+  skyExposureNight: 0.6
+  skyExposureDay: 2

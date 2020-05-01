@@ -17,6 +17,8 @@ namespace CityBuilder
         [System.Serializable]
         public struct UserInput
         {
+            public Vector3 mousePosition;
+            public Vector2 mouseScrollDelta;
             public bool leftClickDown;
             public bool leftClickUp;
             public bool leftClickHold;
@@ -32,8 +34,9 @@ namespace CityBuilder
         public struct CameraSettings
         {
             public float panSpeed;
-            public float minSize;
-            public float maxSize;
+            public float zoomSpeed;
+            public float zoomNearest;
+            public float zoomFarthest;
         }
 
         [System.Serializable]
@@ -52,7 +55,7 @@ namespace CityBuilder
         // Cached References
         //
         [SerializeField] private CityBuildingLibrary buildingLibrary = null;
-        private Camera mainCamera = null;
+        private CameraRig cameraRig = null;
         private CanvasMonitor canvasMonitor = null;
         private PlayerHand playerHand = null;
         private BasicBuilding structureToBuild = null;
@@ -68,7 +71,7 @@ namespace CityBuilder
 
         void Start()
         {
-            mainCamera = Camera.main;
+            cameraRig = FindObjectOfType<CameraRig>();
             playerHand = FindObjectOfType<PlayerHand>();
             canvasMonitor = FindObjectOfType<CanvasMonitor>();
 
@@ -83,7 +86,7 @@ namespace CityBuilder
             RaycastHit hit;
             const float raycastDistance = 200f;
             LayerMask layerMask = LayerMask.GetMask("Terrain");
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = cameraRig._camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit, raycastDistance, layerMask))
                 mouseAimPos = hit.point;
         }
@@ -138,6 +141,8 @@ namespace CityBuilder
 
         private void RegisterUserInput()
         {
+            userInput.mousePosition = Input.mousePosition;
+            userInput.mouseScrollDelta = Input.mouseScrollDelta;
             userInput.leftClickDown = Input.GetMouseButtonDown((int)MouseButtons.LeftClick);
             userInput.leftClickUp = Input.GetMouseButtonUp((int)MouseButtons.LeftClick);
             userInput.leftClickHold = Input.GetMouseButton((int)MouseButtons.LeftClick);
@@ -170,24 +175,26 @@ namespace CityBuilder
             //
             // Camera Zooming
             //
-            if (Input.mouseScrollDelta.y != 0 && IsMouseOverGameWindow())
-                mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize - Input.mouseScrollDelta.y, cameraSettings.minSize, cameraSettings.maxSize);
+            if (userInput.mouseScrollDelta.y != 0 && IsMouseOverGameWindow())
+            {
+                float distanceFromRig = cameraRig._camera.transform.localPosition.y - (userInput.mouseScrollDelta.y * cameraSettings.zoomSpeed);
+                distanceFromRig = Mathf.Clamp(distanceFromRig, cameraSettings.zoomNearest, cameraSettings.zoomFarthest);
+                cameraRig._camera.transform.localPosition = new Vector3(0, distanceFromRig, -distanceFromRig);
+            }
 
             //
             // Camera Panning
             //
             if (userInput.rightClickDown && IsMouseOverGameWindow())
-                initialMousePosition = Input.mousePosition;
+                initialMousePosition = userInput.mousePosition;
             else if (userInput.rightClickUp)
                 initialMousePosition = null;
 
             if (initialMousePosition != null && userInput.rightClickHold)
             {
-                var mouseDelta = (Vector2)(Input.mousePosition) - initialMousePosition.Value;
-                var camPosition = mainCamera.transform.position;
-                camPosition.x += mouseDelta.x * cameraSettings.panSpeed * mainCamera.orthographicSize * Time.deltaTime;
-                camPosition.z += mouseDelta.y * cameraSettings.panSpeed * mainCamera.orthographicSize * Time.deltaTime;
-                mainCamera.transform.position = camPosition;
+                var mouseDelta = new Vector3(userInput.mousePosition.x - initialMousePosition.Value.x, 0, userInput.mousePosition.y - initialMousePosition.Value.y);
+                var cameraDelta = mouseDelta * cameraSettings.panSpeed * cameraRig._camera.transform.localPosition.magnitude * Time.deltaTime;
+                cameraRig.transform.Translate(cameraDelta, Space.Self);
             }
         }
 
