@@ -5,6 +5,13 @@ using UnityEngine;
 public class SmartCityLight : MonoBehaviour
 {
     //
+    // Configurable Parameters
+    //
+    public float switchDelayMin = 0;
+    public float switchDelayMax = 3;
+
+
+    //
     // Cached References
     //
     TimeController timeController = null;
@@ -18,18 +25,28 @@ public class SmartCityLight : MonoBehaviour
         timeController.eventSunrise.AddListener(OnSunrise);
         timeController.eventSunset.AddListener(OnSunset);
         if (timeController.GetDayPeriod() == TimeController.DayPeriod.Day)
-            OnSunrise();
+            TurnLightOff();
         else
-            OnSunset();
+            TurnLightOn();
     }
 
-    void OnSunrise()
+    private void TurnLightOn()
+    {
+        meshRenderer.enabled = true;
+    }
+
+    private void TurnLightOff()
     {
         meshRenderer.enabled = false;
     }
 
-    void OnSunset()
+    private void OnSunrise()
     {
-        meshRenderer.enabled = true;
+        Invoke("TurnLightOff", Random.Range(switchDelayMin, switchDelayMax));
+    }
+
+    private void OnSunset()
+    {
+        Invoke("TurnLightOn", Random.Range(switchDelayMin, switchDelayMax));
     }
 }

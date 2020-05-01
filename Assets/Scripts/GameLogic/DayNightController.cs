@@ -7,120 +7,153 @@ namespace CityBuilder
     [RequireComponent(typeof(TimeController))]
     public class DayNightController : MonoBehaviour
     {
+        public enum AnimationState
+        {
+            Idle,
+            Sunrise,
+            Sunset
+        }
+
         //
         // Configurable Parameters
         //
-        [Header("Lighting")]
-        public bool enableLightCycle = true;
-        public Light mainLight = null;
-        public float lighIntensityMin = 0.4f;
-        public float lightIntensityMax = 1.4f;
+        [Header("Animation")]
+        public float transitionDurationInHours = 2;
+        public AnimationState animState = AnimationState.Idle;
+        [Range(0, 1)] public float alpha = 0;
+
+        [Header("Camera Tint")]
+        public CustomCameraEffect cameraEffect = null;
+        [Range(0, 1)] public float effectWeightNight = 1.0f;
+        [Range(0, 1)] public float effectWeightDay = 0.0f;
 
         [Header("Skybox")]
-        public bool enableSkyCycle = true;
         public Material skyMaterial = null;
         public Color SkyColorDay = new Color(0.8f, 0.88f, 1.0f); // CCE0FF
         public Color SkyColorNight = new Color(0.098f, 0.094f, 0.1f); // 17181A
         public Color GroundColorDay = new Color(0.0f, 0.420f, 1f); // 006BFF
         public Color GroundColorNight = new Color(0.0f, 0.041f, 0.1f); // 000A1A
-        public float skyExposureMin = 0.6f;
-        public float skyExposureMax = 2.0f;
-
-        [Header("Camera Tint")]
-        public bool enableCameraTintCycle = true;
+        public float skyExposureNight = 0.6f;
+        public float skyExposureDay = 2.0f;
 
 
         //
         // Cached References
         //
         private TimeController timeController = null;
-        private float currentLightIntensity = 1.0f;
 
+
+        //
+        // Internal Variables
+        //
+        private float transitionStartTime = 0;
+        private float currentCameraEffectWeight = 0.0f;
         private Color currentSkyColor = Color.white;
         private Color currentGroundColor = Color.white;
         private float currentExposure = 1.0f;
 
-        private CustomCameraEffect cameraEffect = null;
-        private float currentCameraEffectWeight = 0.0f;
-
 
         void Start()
         {
+            cameraEffect = Camera.main.GetComponent<CustomCameraEffect>();
             timeController = GetComponent<TimeController>();
-            cameraEffect = Camera.main.GetComponent<CityBuilder.CustomCameraEffect>();
+            timeController.eventSunrise.AddListener(OnSunrise);
+            timeController.eventSunset.AddListener(OnSunset);
+
+            //
+            // Initialize Scene Lighting
+            //
+            if (timeController.GetDayPeriod() == TimeController.DayPeriod.Day)
+                SetDayLighting();
+            else
+                SetNightLighting();
         }
 
         void Update()
         {
-            float alpha;
-            bool isSunRising;
-            float timeOfDay;
-
-            timeOfDay = (float)timeController.GetCurrentDayTime();
-            if (timeOfDay >= TimeController.TIME_MIDNIGHT && timeOfDay < TimeController.TIME_MIDDAY)
+            switch (animState)
             {
-                isSunRising = true;
-                alpha = timeOfDay / TimeController.TIME_MIDDAY;
-            }
-            else
-            {
-                isSunRising = false;
-                alpha = (timeOfDay - TimeController.TIME_MIDDAY) / TimeController.TIME_MIDDAY;
+                case AnimationState.Sunrise:
+                    alpha = Mathf.Clamp(CalculateTransitionProgress(), 0, 1);
+                    AnimateSunrise(alpha);
+                    if (alpha == 1)
+                        animState = AnimationState.Idle;
+                    break;
+
+                case AnimationState.Sunset:
+                    alpha = Mathf.Clamp(CalculateTransitionProgress(), 0, 1);
+                    AnimateSunset(alpha);
+                    if (alpha == 1)
+                        animState = AnimationState.Idle;
+                    break;
             }
 
-            if (enableLightCycle)
-                UpdateSunIntensity(isSunRising, alpha);
-            if (enableSkyCycle)
-                UpdateSkyboxColor(isSunRising, alpha);
-            if (enableCameraTintCycle)
-                UpdateCameraTint(isSunRising, alpha);
-        }
-
-
-        private void UpdateSkyboxColor(bool isSunRising, float alpha)
-        {
-            if (isSunRising)
-            {
-                currentSkyColor = SmoothLerp(SkyColorNight, SkyColorDay, alpha);
-                currentGroundColor = SmoothLerp(GroundColorNight, GroundColorDay, alpha);
-                currentExposure = SmoothLerp(skyExposureMin, skyExposureMax, alpha);
-            }
-            else
-            {
-                currentSkyColor = SmoothLerp(SkyColorDay, SkyColorNight, alpha);
-                currentGroundColor = SmoothLerp(GroundColorDay, GroundColorNight, alpha);
-                currentExposure = SmoothLerp(skyExposureMax, skyExposureMin, alpha);
-            }
             skyMaterial.SetColor("_SkyTint", currentSkyColor);
             skyMaterial.SetColor("_GroundColor", currentGroundColor);
             skyMaterial.SetFloat("_Exposure", currentExposure);
-        }
-
-
-        private void UpdateSunIntensity(bool isSunRising, float alpha)
-        {
-            if (isSunRising)
-            {
-                currentLightIntensity = SmoothLerp(lighIntensityMin, lightIntensityMax, alpha);
-            }
-            else
-            {
-                currentLightIntensity = SmoothLerp(lightIntensityMax, lighIntensityMin, alpha);
-            }
-            mainLight.intensity = currentLightIntensity;
-        }
-
-        private void UpdateCameraTint(bool isSunRising, float alpha)
-        {
-            if (isSunRising)
-            {
-                currentCameraEffectWeight = SmoothLerp(1, 0, alpha);
-            }
-            else
-            {
-                currentCameraEffectWeight = SmoothLerp(0, 1, alpha);
-            }
             cameraEffect.effectWeight = currentCameraEffectWeight;
+        }
+
+
+        private void SetNightLighting()
+        {
+            alpha = 1;
+            currentSkyColor = SkyColorNight;
+            currentGroundColor = GroundColorNight;
+            currentExposure = skyExposureNight;
+            currentCameraEffectWeight = effectWeightNight;
+        }
+
+
+        private void SetDayLighting()
+        {
+            alpha = 1;
+            currentSkyColor = SkyColorDay;
+            currentGroundColor = GroundColorDay;
+            currentExposure = skyExposureDay;
+            currentCameraEffectWeight = effectWeightDay;
+        }
+
+
+        private void AnimateSunrise(float alpha)
+        {
+            currentSkyColor = SmoothLerp(SkyColorNight, SkyColorDay, alpha);
+            currentGroundColor = SmoothLerp(GroundColorNight, GroundColorDay, alpha);
+            currentExposure = SmoothLerp(skyExposureNight, skyExposureDay, alpha);
+            currentCameraEffectWeight = SmoothLerp(1, 0, alpha);
+        }
+
+
+        private void AnimateSunset(float alpha)
+        {
+            currentSkyColor = SmoothLerp(SkyColorDay, SkyColorNight, alpha);
+            currentGroundColor = SmoothLerp(GroundColorDay, GroundColorNight, alpha);
+            currentExposure = SmoothLerp(skyExposureDay, skyExposureNight, alpha);
+            currentCameraEffectWeight = SmoothLerp(0, 1, alpha);
+        }
+
+
+        private void OnSunrise()
+        {
+            transitionStartTime = timeController.GetCurrentDayTime();
+            animState = AnimationState.Sunrise;
+        }
+
+
+        private void OnSunset()
+        {
+            transitionStartTime = timeController.GetCurrentDayTime();
+            animState = AnimationState.Sunset;
+        }
+
+        private float CalculateTransitionProgress()
+        {
+            float currentDayTime = timeController.GetCurrentDayTime();
+
+            if (currentDayTime < transitionStartTime)
+                currentDayTime += TimeController.SECONDS_PER_DAY;
+
+            return (currentDayTime - transitionStartTime) / (transitionDurationInHours * TimeController.SECONDS_PER_HOUR);
         }
 
 
@@ -128,6 +161,8 @@ namespace CityBuilder
         {
             return Color.Lerp(start, end, Mathf.SmoothStep(0, 1, alpha));
         }
+
+
         private static float SmoothLerp(float start, float end, float alpha)
         {
             return Mathf.Lerp(start, end, Mathf.SmoothStep(0, 1, alpha));

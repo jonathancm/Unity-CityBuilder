@@ -14,6 +14,8 @@ public class TimeController : MonoBehaviour
     //
     // Public Constants
     //
+    public static int SECONDS_PER_MINUTE = 60;
+    public static int MINUTES_PER_HOUR = 60;
     public static int SECONDS_PER_HOUR = 3600;
     public static int SECONDS_PER_DAY = 24 * 3600;
     public static int TIME_MIDNIGHT = 0;
@@ -53,13 +55,13 @@ public class TimeController : MonoBehaviour
         //
         // Update Day Period
         //
-        if (currentDayTime > (6 * SECONDS_PER_HOUR) && currentDayTime < (20 * SECONDS_PER_HOUR))
+        if (dayPeriod == DayPeriod.Night && currentDayTime > (6 * SECONDS_PER_HOUR) && currentDayTime < (20 * SECONDS_PER_HOUR))
         {
             dayPeriod = DayPeriod.Day;
             if(eventSunrise != null)
                 eventSunrise.Invoke();
         }
-        else
+        else if (dayPeriod == DayPeriod.Day && currentDayTime > (20 * SECONDS_PER_HOUR))
         {
             dayPeriod = DayPeriod.Night;
             if (eventSunset != null)
