@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class TimeController : MonoBehaviour
+public class TimeKeeperSystem : MonoBehaviour
 {
     public enum DayPeriod
     {

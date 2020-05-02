@@ -16,11 +16,11 @@ namespace CityBuilder
         //
         // Cached References
         //
-        private TimeController timeController = null;
+        private TimeKeeperSystem timeController = null;
 
         void Start()
         {
-            timeController = FindObjectOfType<TimeController>();
+            timeController = FindObjectOfType<TimeKeeperSystem>();
         }
 
         void Update()
@@ -29,8 +29,8 @@ namespace CityBuilder
                 return;
 
             int timeOfDay = timeController.GetCurrentDayTime();
-            int hours = timeOfDay / TimeController.SECONDS_PER_HOUR;
-            int minutes = (timeOfDay % TimeController.SECONDS_PER_HOUR) / TimeController.SECONDS_PER_MINUTE;
+            int hours = timeOfDay / TimeKeeperSystem.SECONDS_PER_HOUR;
+            int minutes = (timeOfDay % TimeKeeperSystem.SECONDS_PER_HOUR) / TimeKeeperSystem.SECONDS_PER_MINUTE;
             labelTimeOfDay.text = hours.ToString("D2") + " : " + minutes.ToString("D2");
             labelPeriodOfDay.text = timeController.GetDayPeriod().ToString();
         }

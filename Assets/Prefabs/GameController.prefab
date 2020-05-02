@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1425364752905915717}
   - component: {fileID: 1425364752905915714}
+  - component: {fileID: 3315140474752970461}
   - component: {fileID: 4593231105209033920}
   - component: {fileID: 1827569571901684576}
   - component: {fileID: 6203548869377983050}
@@ -48,12 +49,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSettings:
     cellSize: 1
-  cameraSettings:
-    panSpeed: 0.001
-    zoomSpeed: 10
-    zoomNearest: 20
-    zoomFarthest: 100
   buildingLibrary: {fileID: 11400000, guid: bbe34f94f97a5f2409e200d87e3c8932, type: 2}
+--- !u!114 &3315140474752970461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425364752905915716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9721ded38f441e74b951d92137f44b8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4593231105209033920
 MonoBehaviour:
   m_ObjectHideFlags: 0

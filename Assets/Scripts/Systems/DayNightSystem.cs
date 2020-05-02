@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace CityBuilder
 {
-    [RequireComponent(typeof(TimeController))]
-    public class DayNightController : MonoBehaviour
+    [RequireComponent(typeof(TimeKeeperSystem))]
+    public class DayNightSystem : MonoBehaviour
     {
         public enum AnimationState
         {
@@ -40,7 +40,7 @@ namespace CityBuilder
         //
         // Cached References
         //
-        private TimeController timeController = null;
+        private TimeKeeperSystem timeController = null;
 
 
         //
@@ -56,14 +56,14 @@ namespace CityBuilder
         void Start()
         {
             cameraEffect = Camera.main.GetComponent<CustomCameraEffect>();
-            timeController = GetComponent<TimeController>();
+            timeController = GetComponent<TimeKeeperSystem>();
             timeController.eventSunrise.AddListener(OnSunrise);
             timeController.eventSunset.AddListener(OnSunset);
 
             //
             // Initialize Scene Lighting
             //
-            if (timeController.GetDayPeriod() == TimeController.DayPeriod.Day)
+            if (timeController.GetDayPeriod() == TimeKeeperSystem.DayPeriod.Day)
                 SetDayLighting();
             else
                 SetNightLighting();
@@ -151,9 +151,9 @@ namespace CityBuilder
             float currentDayTime = timeController.GetCurrentDayTime();
 
             if (currentDayTime < transitionStartTime)
-                currentDayTime += TimeController.SECONDS_PER_DAY;
+                currentDayTime += TimeKeeperSystem.SECONDS_PER_DAY;
 
-            return (currentDayTime - transitionStartTime) / (transitionDurationInHours * TimeController.SECONDS_PER_HOUR);
+            return (currentDayTime - transitionStartTime) / (transitionDurationInHours * TimeKeeperSystem.SECONDS_PER_HOUR);
         }
 
 

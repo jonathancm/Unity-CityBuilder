@@ -91,8 +91,8 @@ namespace CityBuilder
         {
             Vector3 searchLocation;
             LayerMask layerMask = LayerMask.GetMask("Roads");
-            float cellSize = FindObjectOfType<GameController>().gridSettings.cellSize;
-            float searchRadius = cellSize / 4.0f;
+            float gridSize = GameControlSystem.GRIDSIZE;
+            float searchRadius = gridSize / 4.0f;
             Collider[] hitColliders;
 
             //
@@ -103,22 +103,22 @@ namespace CityBuilder
             //
             // Search Algorithm
             //
-            searchLocation = transform.position + (cellSize * Vector3.forward);
+            searchLocation = transform.position + (gridSize * Vector3.forward);
             hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
             if (hitColliders.Length > 0)
                 connections.front = hitColliders[0].GetComponentInParent<BasicRoad>();
 
-            searchLocation = transform.position + (cellSize * Vector3.right);
+            searchLocation = transform.position + (gridSize * Vector3.right);
             hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
             if (hitColliders.Length > 0)
                 connections.right = hitColliders[0].GetComponentInParent<BasicRoad>();
 
-            searchLocation = transform.position + (cellSize * Vector3.back);
+            searchLocation = transform.position + (gridSize * Vector3.back);
             hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
             if (hitColliders.Length > 0)
                 connections.back = hitColliders[0].GetComponentInParent<BasicRoad>();
 
-            searchLocation = transform.position + (cellSize * Vector3.left);
+            searchLocation = transform.position + (gridSize * Vector3.left);
             hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
             if (hitColliders.Length > 0)
                 connections.left = hitColliders[0].GetComponentInParent<BasicRoad>();

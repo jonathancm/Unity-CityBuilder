@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8133398909110245884}
   - component: {fileID: 992130658196478451}
   m_Layer: 0
-  m_Name: CursorMesh
+  m_Name: HandMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 4748459146997558063}
   - component: {fileID: 4748459146997558049}
   m_Layer: 0
-  m_Name: StructurePreview
+  m_Name: PreviewMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -233,8 +233,8 @@ MonoBehaviour:
   colorInspect: {r: 0, g: 0.6149969, b: 1, a: 1}
   colorValid: {r: 0, g: 1, b: 0, a: 1}
   colorInvalid: {r: 1, g: 0, b: 0, a: 1}
-  cursorMesh: {fileID: 992130658196478451}
-  previewStructureMesh: {fileID: 4748459146997558049}
+  _handMesh: {fileID: 992130658196478451}
+  _previewMesh: {fileID: 4748459146997558049}
 --- !u!65 &385519879374019669
 BoxCollider:
   m_ObjectHideFlags: 0

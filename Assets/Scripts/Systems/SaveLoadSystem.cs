@@ -8,10 +8,10 @@ namespace CityBuilder
 {
     using static BasicBuilding;
 
-    [RequireComponent(typeof(GameController))]
-    public class CityStateSaver : MonoBehaviour
+    [RequireComponent(typeof(GameControlSystem))]
+    public class SaveLoadSystem : MonoBehaviour
     {
-        private GameController gameController = null;
+        private GameControlSystem gameController = null;
 
         private string directoryPath
         {
@@ -23,7 +23,7 @@ namespace CityBuilder
 
         private void Start()
         {
-            gameController = GetComponent<GameController>();
+            gameController = GetComponent<GameControlSystem>();
         }
 
         public void SaveCity()

@@ -16,12 +16,12 @@ namespace CityBuilder
         //
         // Internal Variables
         //
-        private GameController constructionEditor = null;
+        private GameControlSystem constructionEditor = null;
         private TextMeshProUGUI buttonText = null;
 
         private void Start()
         {
-            constructionEditor = FindObjectOfType<GameController>();
+            constructionEditor = FindObjectOfType<GameControlSystem>();
             buttonText = GetComponentInChildren<TextMeshProUGUI>(true);
             if (buttonText == null)
             {

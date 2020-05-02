@@ -9,7 +9,7 @@ namespace CityBuilder
     {
         public void SaveCityState()
         {
-            var cityState = FindObjectOfType<CityStateSaver>();
+            var cityState = FindObjectOfType<SaveLoadSystem>();
             if (cityState == null)
                 return;
 
@@ -18,7 +18,7 @@ namespace CityBuilder
 
         public void LoadCityState()
         {
-            var cityState = FindObjectOfType<CityStateSaver>();
+            var cityState = FindObjectOfType<SaveLoadSystem>();
             if (cityState == null)
                 return;
 
