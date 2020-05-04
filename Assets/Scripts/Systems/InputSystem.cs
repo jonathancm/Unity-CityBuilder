@@ -1,26 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace CityBuilder
 {
     public class InputSystem : MonoBehaviour
     {
-        public enum UserActionType
+        public enum ActionType
         {
             None,
             World,
             UI
         }
 
-        public enum MouseButtons
-        {
-            LeftClick = 0,
-            RightClick = 1,
-            MiddleClick = 2
-        }
-
-        public enum InputButtonState
+        public enum ButtonState
         {
             isHeldUp,
             wasJustPressed,
@@ -31,82 +25,197 @@ namespace CityBuilder
         [System.Serializable]
         public struct MouseInput
         {
-            public InputButtonState leftClick;
-            public InputButtonState middleClick;
-            public InputButtonState rightClick;
+            public ActionType actionType;
+            public ButtonState leftClick;
+            public ButtonState middleClick;
+            public ButtonState rightClick;
             public Vector2 currentScreenPosition;
             public Vector2 deltaScroll;
             public Vector2? dragStartPosition;
+
+            public bool AnyPressed()
+            {
+                if (leftClick == ButtonState.wasJustPressed)
+                    return true;
+
+                if (middleClick == ButtonState.wasJustPressed)
+                    return true;
+
+                if (rightClick == ButtonState.wasJustPressed)
+                    return true;
+
+                return false;
+            }
+
+            public bool AnyHeldDown()
+            {
+                if (leftClick == ButtonState.isHeldDown)
+                    return true;
+
+                if (middleClick == ButtonState.isHeldDown)
+                    return true;
+
+                if (rightClick == ButtonState.isHeldDown)
+                    return true;
+
+                return false;
+            }
+
+            public bool AllHeldUp()
+            {
+                if (leftClick != ButtonState.isHeldUp)
+                    return false;
+
+                if (middleClick != ButtonState.isHeldUp)
+                    return false;
+
+                if (rightClick != ButtonState.isHeldUp)
+                    return false;
+
+                return true;
+            }
         }
 
-        //
-        // Properties
-        //
-        public UserActionType ActionType { get; private set; } = UserActionType.None;
-        public MouseInput Mouse{ get { return _mouse; } }
-        private MouseInput _mouse;
 
         //
         // Cached References
         //
         private CanvasMonitor canvasMonitor = null;
 
-        private void Start()
+
+        //
+        // Internal Variables
+        //
+        private MouseInput mouseInput;
+        private Dictionary<KeyCode, ButtonState> keyboardInput = new Dictionary<KeyCode, ButtonState>();
+
+
+        //
+        // Public Interface
+        //
+        public static bool IsMouseOverGameWindow()
         {
-            canvasMonitor = FindObjectOfType<CanvasMonitor>();
+            if (Input.mousePosition.x < 0 || Input.mousePosition.x > Screen.width )
+                return false;
+
+            if (Input.mousePosition.y < 0 || Input.mousePosition.y > Screen.height)
+                return false;
+
+            return true;
+        }
+
+        public MouseInput GetMouseInput()
+        { 
+            return mouseInput;
+        }
+
+        public ButtonState GetButtonState(KeyCode keyCode)
+        {
+            //
+            // Mouse Button
+            //
+            switch(keyCode)
+            {
+                case KeyCode.Mouse0:
+                    return mouseInput.leftClick;
+                case KeyCode.Mouse1:
+                    return mouseInput.rightClick;
+                case KeyCode.Mouse2:
+                    return mouseInput.middleClick;
+            }
+
+            //
+            // Keyboard Button
+            //
+            if (keyboardInput.ContainsKey(keyCode))
+                return keyboardInput[keyCode];
+            else
+                return ButtonState.isHeldUp;
         }
 
         public void UpdateInput()
         {
             //
-            // General Input
+            // Keyboard Input
             //
-            _mouse.currentScreenPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            _mouse.deltaScroll = IsMouseOverGameWindow() ? Input.mouseScrollDelta : Vector2.zero;
-            _mouse.leftClick = GetMouseButtonState(MouseButtons.LeftClick);
-            _mouse.rightClick = GetMouseButtonState(MouseButtons.RightClick);
-            _mouse.middleClick = GetMouseButtonState(MouseButtons.MiddleClick);
+            foreach (var kvp in keyboardInput.ToArray())
+                keyboardInput[kvp.Key] = GetKeyboardButtonState(kvp.Key);
 
             //
-            // Drag detection
+            // Mouse Input
             //
-            if (_mouse.rightClick == InputButtonState.wasJustPressed)
-                _mouse.dragStartPosition = _mouse.currentScreenPosition;
-            else if (_mouse.rightClick == InputButtonState.wasJustReleased)
-                _mouse.dragStartPosition = null;
+            mouseInput.currentScreenPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            mouseInput.deltaScroll = IsMouseOverGameWindow() ? Input.mouseScrollDelta : Vector2.zero;
+            mouseInput.leftClick = GetMouseButtonState(KeyCode.Mouse0);
+            mouseInput.rightClick = GetMouseButtonState(KeyCode.Mouse1);
+            mouseInput.middleClick = GetMouseButtonState(KeyCode.Mouse2);
 
             //
-            // Action Type
+            // Mouse Drag detection
             //
-            if (_mouse.leftClick == InputButtonState.wasJustPressed
-                || _mouse.rightClick == InputButtonState.wasJustPressed
-                || _mouse.middleClick == InputButtonState.wasJustPressed)
-            {
-                ActionType = canvasMonitor.isPointerOverGUI ? UserActionType.UI : UserActionType.World;
-            }
-            else if (_mouse.leftClick == InputButtonState.isHeldUp
-                && _mouse.rightClick == InputButtonState.isHeldUp
-                && _mouse.middleClick == InputButtonState.isHeldUp)
-            {
-                ActionType = UserActionType.None;
-            }
+            if (mouseInput.rightClick == ButtonState.wasJustPressed)
+                mouseInput.dragStartPosition = mouseInput.currentScreenPosition;
+            else if (mouseInput.rightClick == ButtonState.wasJustReleased)
+                mouseInput.dragStartPosition = null;
+
+            //
+            // Mouse Action Type
+            //
+            if (mouseInput.AnyPressed())
+                mouseInput.actionType = canvasMonitor.isPointerOverGUI ? ActionType.UI : ActionType.World;
+            else if (mouseInput.AllHeldUp())
+                mouseInput.actionType = ActionType.None;
         }
 
-        private InputButtonState GetMouseButtonState(MouseButtons button)
+
+
+
+        //
+        // Private Methods
+        //
+        private void Start()
         {
-            if (Input.GetMouseButtonDown((int)button) && IsMouseOverGameWindow())
-                return InputButtonState.wasJustPressed;
-            else if (Input.GetMouseButtonUp((int)button))
-                return InputButtonState.wasJustReleased;
-            else if (Input.GetMouseButton((int)button) == true)
-                return InputButtonState.isHeldDown;
+            canvasMonitor = FindObjectOfType<CanvasMonitor>();
+            InitializeKeyboardInput();
+        }
+
+        private void InitializeKeyboardInput()
+        {
+            keyboardInput.Add(KeyCode.W, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.A, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.S, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.D, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.Q, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.E, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.UpArrow, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.RightArrow, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.DownArrow, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.LeftArrow, ButtonState.isHeldUp);
+            keyboardInput.Add(KeyCode.Home, ButtonState.isHeldUp);
+        }
+
+        private ButtonState GetKeyboardButtonState(KeyCode keyCode)
+        {
+            if (Input.GetKeyDown(keyCode))
+                return ButtonState.wasJustPressed;
+            else if (Input.GetKeyUp(keyCode))
+                return ButtonState.wasJustReleased;
+            else if (Input.GetKey(keyCode))
+                return ButtonState.isHeldDown;
             else
-                return InputButtonState.isHeldUp;
+                return ButtonState.isHeldUp;
         }
 
-        public static bool IsMouseOverGameWindow()
+        private ButtonState GetMouseButtonState(KeyCode keyCode)
         {
-            return !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
+            if (Input.GetKeyDown(keyCode) && IsMouseOverGameWindow())
+                return ButtonState.wasJustPressed;
+            else if (Input.GetKeyUp(keyCode))
+                return ButtonState.wasJustReleased;
+            else if (Input.GetKey(keyCode))
+                return ButtonState.isHeldDown;
+            else
+                return ButtonState.isHeldUp;
         }
     }
 }

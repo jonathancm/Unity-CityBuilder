@@ -55,9 +55,10 @@ namespace CityBuilder
         private void Update()
         {
             inputSystem.UpdateInput();
-            if (inputSystem.ActionType != InputSystem.UserActionType.UI)
+            HandleCameraMovement();
+
+            if (inputSystem.GetMouseInput().actionType != InputSystem.ActionType.UI)
             {
-                HandleCameraMovement();
                 switch (canvasMonitor.GetActivePanel())
                 {
                     case CanvasMonitor.ToolboxPanels.Construction:
@@ -80,13 +81,108 @@ namespace CityBuilder
         }
 
 
+        //
+        // TODO: Create system to map input to game action
+        //
         private void HandleCameraMovement()
         {
-            if (inputSystem.Mouse.deltaScroll.y != 0)
-                cameraRig.Zoom(inputSystem.Mouse.deltaScroll.y);
+            InputSystem.MouseInput mouseInput = inputSystem.GetMouseInput();
 
-            if (inputSystem.Mouse.dragStartPosition != null && inputSystem.Mouse.rightClick == InputSystem.InputButtonState.isHeldDown)
-                cameraRig.Pan(inputSystem.Mouse.dragStartPosition.Value, inputSystem.Mouse.currentScreenPosition);
+            //
+            // Reset Orientation
+            //
+            if (inputSystem.GetButtonState(KeyCode.Home) == InputSystem.ButtonState.wasJustPressed)
+            {
+                cameraRig.ResetOrientation();
+                return;
+            }
+
+
+            //
+            // Zooming
+            //
+            if (mouseInput.actionType != InputSystem.ActionType.UI && mouseInput.deltaScroll.y != 0)
+            {
+                float zoomAxis = Mathf.Clamp(mouseInput.deltaScroll.y, -1, 1);
+                cameraRig.Zoom(zoomAxis);
+            }
+
+
+            //
+            // Rotating
+            //
+            bool isRotating = false;
+            if (inputSystem.GetButtonState(KeyCode.Q) == InputSystem.ButtonState.isHeldDown
+                || inputSystem.GetButtonState(KeyCode.E) == InputSystem.ButtonState.isHeldDown)
+                isRotating = true;
+
+            if (isRotating)
+            {
+                float axisRight = 0;
+                if (inputSystem.GetButtonState(KeyCode.E) == InputSystem.ButtonState.isHeldDown)
+                    axisRight = 1;
+
+                float axisLeft = 0;
+                if (inputSystem.GetButtonState(KeyCode.Q) == InputSystem.ButtonState.isHeldDown)
+                    axisLeft = 1;
+
+                float rotateAxis = Mathf.Clamp(axisRight - axisLeft, -1, 1);
+                cameraRig.Rotate(rotateAxis);
+            }
+
+
+            //
+            // Panning
+            //
+            bool isKeyboardPan = false;
+            if (inputSystem.GetButtonState(KeyCode.W) == InputSystem.ButtonState.isHeldDown
+                || inputSystem.GetButtonState(KeyCode.A) == InputSystem.ButtonState.isHeldDown
+                || inputSystem.GetButtonState(KeyCode.S) == InputSystem.ButtonState.isHeldDown
+                || inputSystem.GetButtonState(KeyCode.D) == InputSystem.ButtonState.isHeldDown)
+                isKeyboardPan = true;
+
+            bool isMousePan = false;
+            if (mouseInput.actionType != InputSystem.ActionType.UI
+                && mouseInput.dragStartPosition != null 
+                && inputSystem.GetButtonState(KeyCode.Mouse1) == InputSystem.ButtonState.isHeldDown)
+                isMousePan = true;
+
+            if (isKeyboardPan)
+            {
+                float axisUp = 0;
+                if (inputSystem.GetButtonState(KeyCode.W) == InputSystem.ButtonState.isHeldDown)
+                    axisUp = 1;
+
+                float axisDown = 0;
+                if (inputSystem.GetButtonState(KeyCode.S) == InputSystem.ButtonState.isHeldDown)
+                    axisDown = 1;
+
+                float axisRight = 0;
+                if (inputSystem.GetButtonState(KeyCode.D) == InputSystem.ButtonState.isHeldDown)
+                    axisRight = 1;
+
+                float axisLeft = 0;
+                if (inputSystem.GetButtonState(KeyCode.A) == InputSystem.ButtonState.isHeldDown)
+                    axisLeft = 1;
+
+                Vector2 panAxis = Vector2.zero;
+                panAxis.x = Mathf.Clamp(axisRight - axisLeft, -1, 1);
+                panAxis.y = Mathf.Clamp(axisUp - axisDown, -1, 1);
+                cameraRig.Pan(panAxis);
+            }
+            else if(isMousePan)
+            {
+                float mouseDeltaX = inputSystem.GetMouseInput().currentScreenPosition.x - inputSystem.GetMouseInput().dragStartPosition.Value.x;
+                float mouseDeltaY = inputSystem.GetMouseInput().currentScreenPosition.y - inputSystem.GetMouseInput().dragStartPosition.Value.y;
+
+                float axisRight = (mouseDeltaX / Screen.width) * 2;
+                float axisUp = (mouseDeltaY / Screen.height) * 2;
+
+                Vector2 panAxis = Vector2.zero;
+                panAxis.x = Mathf.Clamp(axisRight, -1, 1);
+                panAxis.y = Mathf.Clamp(axisUp, -1, 1);
+                cameraRig.Pan(panAxis * 3);
+            }
         }
 
         private void HandleConstructionActions()
@@ -155,7 +251,7 @@ namespace CityBuilder
             {
                 case BuildingDescriptor.Category.Building:
                 {
-                    if (inputSystem.Mouse.leftClick == InputSystem.InputButtonState.wasJustPressed && !isGridOccupied)
+                    if (inputSystem.GetButtonState(KeyCode.Mouse0) == InputSystem.ButtonState.wasJustPressed && !isGridOccupied)
                     {
                         CreateStructure(structureToBuild, playerHand.GridPosition);
                     }
@@ -169,7 +265,7 @@ namespace CityBuilder
                     //
                     // Allow click and hold
                     //
-                    if (inputSystem.Mouse.leftClick == InputSystem.InputButtonState.isHeldDown && !isGridOccupied)
+                    if (inputSystem.GetButtonState(KeyCode.Mouse0) == InputSystem.ButtonState.isHeldDown && !isGridOccupied)
                     {
                         CreateStructure(structureToBuild, playerHand.GridPosition);
                     }
@@ -178,7 +274,7 @@ namespace CityBuilder
 
                 default: // Eraser
                 {
-                    if (inputSystem.Mouse.leftClick == InputSystem.InputButtonState.isHeldDown && isGridOccupied)
+                    if (inputSystem.GetButtonState(KeyCode.Mouse0) == InputSystem.ButtonState.isHeldDown && isGridOccupied)
                     {
                         structureAtLocation.OnErase();
                         Destroy(structureAtLocation.gameObject);

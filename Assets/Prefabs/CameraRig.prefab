@@ -46,10 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 6969825387636771139}
   cameraSettings:
-    panSpeed: 0.001
-    zoomSpeed: 10
+    zoomSpeed: 20
     zoomNearest: 20
     zoomFarthest: 200
+    rotateSpeed: 12
+    panSpeed: 0.5
 --- !u!1 &6969825387636771137
 GameObject:
   m_ObjectHideFlags: 0
