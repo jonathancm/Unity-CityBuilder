@@ -57,26 +57,28 @@ namespace CityBuilder
         public override void OnBuild()
         {
             base.OnBuild();
-            UpdateTileAndChainOnce();
+            RefreshVisualsAndChainOnce();
         }
 
         public override void OnErase()
         {
             GetComponentInChildren<BoxCollider>().enabled = false;
-            UpdateTileAndChainOnce();
+            RefreshVisualsAndChainOnce();
             base.OnErase();
         }
 
-        public void UpdateSingleTile()
+        public override void RefreshVisuals()
         {
             UpdateTileConnections();
             RefreshTileVisual();
+            NotifySurroundingBuildings();
         }
 
-        public void UpdateTileAndChainOnce()
+        public override void RefreshVisualsAndChainOnce()
         {
             UpdateTileConnections(true);
             RefreshTileVisual();
+            NotifySurroundingBuildings();
         }
 
 
@@ -89,39 +91,20 @@ namespace CityBuilder
         //
         private void UpdateTileConnections(bool chainedUpdate = false)
         {
-            Vector3 searchLocation;
             LayerMask layerMask = LayerMask.GetMask("Roads");
-            float gridSize = GameControlSystem.GRIDSIZE;
-            float searchRadius = gridSize / 4.0f;
-            Collider[] hitColliders;
-
-            //
-            // Reset State
-            //
-            connections.Clear();
 
             //
             // Search Algorithm
             //
-            searchLocation = transform.position + (gridSize * Vector3.forward);
-            hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
-            if (hitColliders.Length > 0)
-                connections.front = hitColliders[0].GetComponentInParent<BasicRoad>();
-
-            searchLocation = transform.position + (gridSize * Vector3.right);
-            hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
-            if (hitColliders.Length > 0)
-                connections.right = hitColliders[0].GetComponentInParent<BasicRoad>();
-
-            searchLocation = transform.position + (gridSize * Vector3.back);
-            hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
-            if (hitColliders.Length > 0)
-                connections.back = hitColliders[0].GetComponentInParent<BasicRoad>();
-
-            searchLocation = transform.position + (gridSize * Vector3.left);
-            hitColliders = Physics.OverlapSphere(searchLocation, searchRadius, layerMask);
-            if (hitColliders.Length > 0)
-                connections.left = hitColliders[0].GetComponentInParent<BasicRoad>();
+            connections.Clear();
+            if (SearchSurroundings(layerMask, Vector3.forward))
+                connections.front = _searchResult.GetComponentInParent<BasicRoad>();
+            if (SearchSurroundings(layerMask, Vector3.right))
+                connections.right = _searchResult.GetComponentInParent<BasicRoad>();
+            if (SearchSurroundings(layerMask, Vector3.back))
+                connections.back = _searchResult.GetComponentInParent<BasicRoad>();
+            if (SearchSurroundings(layerMask, Vector3.left))
+                connections.left = _searchResult.GetComponentInParent<BasicRoad>();
 
             //
             // Chain update to connections (1 chain only)
@@ -129,13 +112,13 @@ namespace CityBuilder
             if (chainedUpdate)
             {
                 if (connections.front != null)
-                    connections.front.UpdateSingleTile();
+                    connections.front.RefreshVisuals();
                 if (connections.right != null)
-                    connections.right.UpdateSingleTile();
+                    connections.right.RefreshVisuals();
                 if (connections.back != null)
-                    connections.back.UpdateSingleTile();
+                    connections.back.RefreshVisuals();
                 if (connections.left != null)
-                    connections.left.UpdateSingleTile();
+                    connections.left.RefreshVisuals();
             }
         }
 
@@ -228,6 +211,30 @@ namespace CityBuilder
                     break;
                 }
             }
+        }
+
+        private void NotifySurroundingBuildings()
+        {
+            LayerMask layerMask = LayerMask.GetMask("Buildings");
+            var buildings = new List<BasicBuilding>();
+
+            //
+            // Search Algorithm
+            //
+            if (SearchSurroundings(layerMask, Vector3.forward)) 
+                buildings.Add(_searchResult.GetComponentInParent<BasicBuilding>());
+            if (SearchSurroundings(layerMask, Vector3.right))
+                buildings.Add(_searchResult.GetComponentInParent<BasicBuilding>());
+            if (SearchSurroundings(layerMask, Vector3.back))
+                buildings.Add(_searchResult.GetComponentInParent<BasicBuilding>());
+            if (SearchSurroundings(layerMask, Vector3.left))
+                buildings.Add(_searchResult.GetComponentInParent<BasicBuilding>());
+
+            //
+            // Notify
+            //
+            foreach (var building in buildings)
+                building.RefreshVisuals();
         }
     }
 }
