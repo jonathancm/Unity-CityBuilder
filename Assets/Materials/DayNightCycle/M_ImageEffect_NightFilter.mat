@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_NightFilter
+  m_Name: M_ImageEffect_NightFilter
   m_Shader: {fileID: 4800000, guid: cd330214ac7b6e8469cb17a58284cc83, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -19,7 +19,9 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
+    m_Ints: []
     m_Floats:
-    - _Weight: 1
+    - _Weight: 0
     m_Colors:
     - _Tint: {r: 0.6, g: 0.6, b: 1, a: 1}
+  m_BuildTextureStacks: []

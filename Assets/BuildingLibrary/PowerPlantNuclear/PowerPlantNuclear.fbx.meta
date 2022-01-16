@@ -3,7 +3,12 @@ guid: 7fbc1c49dfcad1948abb7384e3d9647f
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_PowerPlantNuclear
+    second: {fileID: 2100000, guid: 0b909fc7d2a6177438769ce003ea2bfe, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

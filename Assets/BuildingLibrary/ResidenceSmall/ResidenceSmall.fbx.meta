@@ -3,7 +3,12 @@ guid: 60c42b386ff7cfe4593574760b2adcbe
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_ResidenceSmall
+    second: {fileID: 2100000, guid: 9facc889e34c9a544a610bae8680632d, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
